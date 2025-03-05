@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
-    "build": "pnpm run tsc",
-    "dev": "pnpm run nodemon ./src/index.ts",
-    "start": "node ./build/index.js",
+    "build": "bun run tsc",
+    "dev": "bun --watch ./src/index.ts",
+    "start": "bun ./build/index.js",
     "tsc": "tsc"
   },
   "keywords": [],
@@ -22,13 +22,11 @@
     "helmet": "^8.0.0"
   },
   "devDependencies": {
+    "@types/bun": "^1.2.4",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
-    "@types/node": "^22.13.9",
     "@yarnpkg/pnpify": "^4.1.4",
-    "nodemon": "^3.1.9",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.2"
-  },
-  "packageManager": "pnpm@10.5.2"
+  }
 }
