@@ -1,4 +1,4 @@
-![ALTCHA](./logo-black.altcha.svg)
+<img src="./logo-black.altcha.svg" alt="ALTCHA" width="240" />
 
 # ALTCHA Docker
 
@@ -19,6 +19,14 @@ Copy-Item .env.example .env -ErrorAction SilentlyContinue
 docker compose up --build
 ```
 
+```bash
+# Unix/macOS (bash/zsh)
+# Optionally create a .env file (see below) or set variables in your shell
+[ -f .env ] || cp .env.example .env
+# Start the stack
+docker compose up --build
+```
+
 - API base: http://localhost:3000
 - Demo (if enabled): http://localhost:8080
 
@@ -26,6 +34,12 @@ To override the secret temporarily in PowerShell:
 
 ```powershell
 $env:SECRET = "your-very-long-random-key"; docker compose up --build
+```
+
+Unix/macOS:
+
+```bash
+SECRET="your-very-long-random-key" docker compose up --build
 ```
 
 ## Configuration
@@ -102,6 +116,15 @@ From PowerShell, you can test verification manually:
 curl "http://localhost:3000/verify?altcha=$([uri]::EscapeDataString($payload))" -Method GET -UseBasicParsing
 ```
 
+On Unix/macOS, you can test verification manually:
+
+```bash
+# Assuming $payload contains the exact `altcha` value from the client
+curl -G \
+  --data-urlencode "altcha=$payload" \
+  http://localhost:3000/verify -i
+```
+
 Expect 202 on success or 417 on failure/reuse.
 
 ## Building and running without Docker
@@ -114,9 +137,21 @@ bun run build
 bun start
 ```
 
+```bash
+# Unix/macOS
+bun install
+bun run build
+bun start
+```
+
 Or for live reload during development:
 
 ```powershell
+bun run dev
+```
+
+```bash
+# Unix/macOS
 bun run dev
 ```
 
