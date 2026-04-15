@@ -22,8 +22,8 @@ const addMinutesToDate = (date: Date, n: number) => {
   const corsOptions = {
     origin: '*'
   };
-  
-  app.use(cors(corsOptions)); 
+
+  app.use(cors(corsOptions));
 
   const port = process.env.PORT || 3000;
   const hmacKey = process.env.SECRET as string;
@@ -72,26 +72,26 @@ if (process.env.DEMO?.toLowerCase() === "true") {
         }
       }
     }));
-    
+
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
-  
+
     const port = 8080;
-  
+
     app.get("/", (req: Request, res: Response) => {
       res.sendFile(path.join(__dirname, '/demo/index.html'));
     });
 
     app.post("/test", async (req: Request, res: Response) => {
       try {
-        var result = await axios.get("http://localhost:3000/verify", { params: {altcha: req.body.altcha }})
+        var result = await axios.get("http://localhost:3000/verify", { params: { altcha: req.body.altcha } })
         res.sendStatus(result.status);
-      } catch(ex: any) {
+      } catch (ex: any) {
         //console.error(ex);
         res.sendStatus(ex.status);
       }
     });
-  
+
     app.listen(port, () => {
       console.log(`[ALTCHA]: Captcha Test Server is running at http://localhost:${port}`);
     });
