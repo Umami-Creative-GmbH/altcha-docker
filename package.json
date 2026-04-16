@@ -13,20 +13,20 @@
   "license": "MIT",
   "description": "Docker Image for altcha captcha solution",
   "dependencies": {
-    "altcha": "^2.2.1",
-    "altcha-lib": "^1.2.0",
-    "axios": "^1.8.2",
-    "cors": "^2.8.5",
-    "dotenv": "^17.2.1",
-    "express": "^5.1.0",
-    "helmet": "^8.0.0"
+    "altcha": "^3.0.2",
+    "altcha-lib": "^2.0.2",
+    "axios": "^1.15.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "helmet": "^8.1.0"
   },
   "devDependencies": {
-    "@types/bun": "^1.2.5",
-    "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.0",
-    "@yarnpkg/pnpify": "^4.1.4",
+    "@types/bun": "^1.3.12",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@yarnpkg/pnpify": "^4.1.6",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.2"
+    "typescript": "^6.0.2"
   }
 }

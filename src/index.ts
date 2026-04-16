@@ -72,12 +72,12 @@ if (process.env.DEMO?.toLowerCase() === "true") {
         }
       }
     }));
-    
+
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
-  
+
     const port = 8080;
-  
+
     app.get("/", (req: Request, res: Response) => {
       res.sendFile(path.join(__dirname, '/demo/index.html'));
     });
@@ -95,12 +95,12 @@ if (process.env.DEMO?.toLowerCase() === "true") {
       try {
         var result = await axios.get(`http://localhost:${process.env.PORT || 3000}/verify`, { params: {altcha: req.body.altcha }})
         res.sendStatus(result.status);
-      } catch(ex: any) {
+      } catch (ex: any) {
         //console.error(ex);
         res.sendStatus(ex.status);
       }
     });
-  
+
     app.listen(port, () => {
       console.log(`[ALTCHA]: Captcha Test Server is running at http://localhost:${port}`);
     });
