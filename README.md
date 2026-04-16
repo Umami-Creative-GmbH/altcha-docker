@@ -50,6 +50,10 @@ The service reads the following environment variables:
 - PORT: API port, default 3000.
 - EXPIREMINUTES: Challenge expiry in minutes, default 10.
 - MAXRECORDS: Size of in‑memory single‑use token cache, default 1000.
+- CORS_ORIGIN: Allowed CORS origin(s), default *. Use comma-separated values for multiple origins.
+- ALGORITHM: ALTCHA v2 algorithm, default PBKDF2/SHA-256.
+- MAXNUMBER: ALTCHA v2 proof-of-work cost (difficulty), default 5000.
+- API_BASE_URL: Optional demo proxy target for /challenge and /verify. Defaults to http://127.0.0.1:$PORT.
 - DEMO: When "true", starts a simple demo UI on port 8080.
 
 You can provide variables via:
@@ -65,7 +69,27 @@ SECRET=change-me-to-a-long-random-string
 PORT=3000
 EXPIREMINUTES=10
 MAXRECORDS=1000
+CORS_ORIGIN=*
+ALGORITHM=PBKDF2/SHA-256
+MAXNUMBER=5000
+# API_BASE_URL=http://127.0.0.1:3000
 DEMO=false
+```
+
+## Migration note (COST -> MAXNUMBER)
+
+- `MAXNUMBER` is now the preferred environment variable for ALTCHA v2 proof-of-work difficulty.
+- Existing setups using `COST` still work for backward compatibility.
+- If both are set, `MAXNUMBER` takes precedence.
+
+Recommended update for existing deployments:
+
+```env
+# old
+# COST=5000
+
+# new
+MAXNUMBER=5000
 ```
 
 ## Endpoints
@@ -91,7 +115,7 @@ Notes:
 
 ## Demo UI (optional)
 
-Enable the built-in demo page by setting DEMO=true. It serves a minimal HTML form at http://localhost:8080 that embeds the ALTCHA widget pointing to the API at port 3000.
+Enable the built-in demo page by setting DEMO=true. It serves a minimal HTML form at http://localhost:8080 and proxies widget requests through the demo server at /challenge (and form verification to /verify via the same proxy target). This avoids hardcoded localhost API URLs and works better when running on remote hosts.
 
 ## Client integration example
 
@@ -164,4 +188,6 @@ bun run dev
 
 ## License
 
-MIT © Umami Creative GmbH
+Licensed under the [MIT License](LICENSE).
+
+❤️ made with passion in Erlangen by Umami Creative GmbH
