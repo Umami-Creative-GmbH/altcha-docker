@@ -21,8 +21,11 @@ const addMinutesToDate = (date: Date, n: number) => {
   app.use(helmet());
   app.use(express.json());
 
+  const corsOrigin = (process.env.CORS_ORIGIN || "*").trim();
   const corsOptions = {
-    origin: '*'
+    origin: corsOrigin === "*"
+      ? "*"
+      : corsOrigin.split(",").map((origin) => origin.trim()).filter(Boolean)
   };
 
   app.use(cors(corsOptions));
@@ -31,7 +34,7 @@ const addMinutesToDate = (date: Date, n: number) => {
   const hmacKey = process.env.SECRET as string;
   const expireMinutes = Number(process.env.EXPIREMINUTES || 10);
   const maxRecords = Number(process.env.MAXRECORDS || 1000);
-  const cost = Number(process.env.COST || 5000);
+  const maxNumber = Number(process.env.MAXNUMBER || process.env.COST || 5000);
   const algorithm = process.env.ALGORITHM || "PBKDF2/SHA-256";
   const hmacKeySignatureSecret = await deriveHmacKeySecret(hmacKey);
 
@@ -59,7 +62,7 @@ const addMinutesToDate = (date: Date, n: number) => {
   app.get("/challenge", async (_req: Request, res: Response) => {
     const challenge = await createChallenge({
       algorithm,
-      cost,
+      cost: maxNumber,
       deriveKey,
       expiresAt: addMinutesToDate(new Date(), expireMinutes),
       hmacSignatureSecret: hmacKey,
@@ -87,13 +90,15 @@ const addMinutesToDate = (date: Date, n: number) => {
 if (process.env.DEMO?.toLowerCase() === "true") {
   (async () => {
     const app: Express = express();
+    const apiPort = Number(process.env.PORT || 3000);
+    const apiBaseUrl = process.env.API_BASE_URL || `http://127.0.0.1:${apiPort}`;
     app.use(helmet({
       contentSecurityPolicy: {
         useDefaults: true,
         directives: {
-          "script-src": ["'self'", "https://cdn.jsdelivr.net", "http://localhost:3000", "http://localhost:8080"],
-          "connect-src": ["'self'", "http://localhost:3000", "http://localhost:8080", "blob://*"],
-          "worker-src": ["'self'", "http://localhost:3000", "http://localhost:8080", "blob://*"],
+          "script-src": ["'self'", "https://cdn.jsdelivr.net"],
+          "connect-src": ["'self'", "blob:"],
+          "worker-src": ["'self'", "blob:"],
         }
       }
     }));
@@ -107,9 +112,19 @@ if (process.env.DEMO?.toLowerCase() === "true") {
       res.sendFile(path.join(__dirname, '/demo/index.html'));
     });
 
+    app.get("/challenge", async (_req: Request, res: Response) => {
+      try {
+        const result = await axios.get(`${apiBaseUrl}/challenge`);
+        res.status(result.status).json(result.data);
+      } catch (ex) {
+        const error = ex as { status?: number; response?: { status?: number } };
+        res.sendStatus(error.response?.status || error.status || 502);
+      }
+    });
+
     app.post("/test", async (req: Request, res: Response) => {
       try {
-        const result = await axios.get("http://localhost:3000/verify", { params: { altcha: req.body.altcha } })
+        const result = await axios.get(`${apiBaseUrl}/verify`, { params: { altcha: req.body.altcha } })
         res.sendStatus(result.status);
       } catch (ex) {
         const error = ex as { status?: number; response?: { status?: number } };
