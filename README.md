@@ -50,6 +50,8 @@ The service reads the following environment variables:
 - PORT: API port, default 3000.
 - EXPIREMINUTES: Challenge expiry in minutes, default 10.
 - MAXRECORDS: Size of in‑memory single‑use token cache, default 1000.
+- ALGORITHM: ALTCHA v2 algorithm, default PBKDF2/SHA-256.
+- COST: ALTCHA v2 work factor, default 5000.
 - DEMO: When "true", starts a simple demo UI on port 8080.
 
 You can provide variables via:
@@ -65,6 +67,8 @@ SECRET=change-me-to-a-long-random-string
 PORT=3000
 EXPIREMINUTES=10
 MAXRECORDS=1000
+ALGORITHM=PBKDF2/SHA-256
+COST=5000
 DEMO=false
 ```
 
