@@ -6,6 +6,8 @@
     "build": "bun run tsc",
     "dev": "bun --watch ./src/index.ts",
     "start": "bun ./build/index.js",
+    "start:demo": "bun ./build/demo.js",
+    "test": "bun test",
     "tsc": "tsc"
   },
   "keywords": [],
