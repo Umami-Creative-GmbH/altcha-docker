@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
-    "build": "bun run tsc",
+    "build": "bun run tsc && bun ./scripts/copy-demo-assets.ts",
     "dev": "bun --watch ./src/index.ts",
     "start": "bun ./build/index.js",
     "start:demo": "bun ./build/demo.js",
