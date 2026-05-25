@@ -46,7 +46,7 @@ SECRET="your-very-long-random-key" docker compose up --build
 
 The API service reads the following environment variables:
 
-- SECRET (required): HMAC key used to sign/verify challenges. Default is `$ecret.key` when unset (don’t use this in production). Use a Compose-safe value such as `change-me-to-a-long-random-string` in `.env`.
+- SECRET (required): HMAC key used to sign/verify challenges. The API app requires this value when run directly. Docker Compose supplies `$ecret.key` only as a local testing fallback when `SECRET` is unset; don’t use it in production. Use a Compose-safe value such as `change-me-to-a-long-random-string` in `.env`.
 - PORT: API port, default 3000.
 - EXPIREMINUTES: Challenge expiry in minutes, default 10.
 - MAXRECORDS: Size of in‑memory single‑use token cache, default 1000.
@@ -56,7 +56,7 @@ The API service reads the following environment variables:
 
 The demo service reads the following environment variables:
 
-- API_BASE_URL: Demo proxy target for /challenge and /verify, default http://server:3000 in Docker Compose.
+- API_BASE_URL: Base API URL used by the demo to proxy `GET /challenge` and verify demo form submissions from `POST /test`, default http://server:3000 in Docker Compose.
 - DEMO_PORT: Demo HTTP port, default 8080.
 
 You can provide variables via:
@@ -123,7 +123,7 @@ Notes:
 
 ## Demo UI
 
-Docker Compose starts a dedicated demo service at http://localhost:8080. It serves a minimal HTML form and proxies widget requests through the demo server at /challenge (and form verification to /verify via the same `API_BASE_URL` target). This avoids hardcoded localhost API URLs and works better when running on remote hosts.
+Docker Compose starts a dedicated demo service at http://localhost:8080. The demo serves `/`, exposes `GET /challenge` for the widget and proxies it to API `/challenge`, and accepts the demo form at `POST /test`, which calls API `/verify` through the same `API_BASE_URL` target. The demo does not expose a public `/verify` route.
 
 ## Client integration example
 

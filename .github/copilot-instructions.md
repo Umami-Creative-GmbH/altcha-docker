@@ -12,7 +12,7 @@
 - `src/index.ts`: API startup; loads dotenv, parses API config, starts the API app on `PORT` (default 3000).
 - `src/api-app.ts`: Express API app with `/`, `/challenge`, and `/verify`.
 - `src/demo.ts`: Demo startup; loads dotenv, parses demo config, starts the demo app on `DEMO_PORT` (default 8080).
-- `src/demo-app.ts`: Express demo app, static demo assets, and proxy routes for `/challenge` and `/verify`.
+- `src/demo-app.ts`: Express demo app, static demo assets, `GET /challenge` proxy to API `/challenge`, and `POST /test` form handler that calls API `/verify`.
 - `src/config.ts`: API/demo env parsing and validation.
 - `src/replay-store.ts`: In-memory single-use token replay protection.
 - `Dockerfile`: multi-stage Bun build with separate `api` and `demo` targets; does not copy `.env` into final images.
@@ -33,7 +33,7 @@
 
 ## Configuration (env)
 
-- `SECRET` (required): HMAC key for ALTCHA. Default `$ecret.key` is unsafe; code logs a warning if used.
+- `SECRET` (required): HMAC key for ALTCHA. The API app requires it when run directly. Compose supplies `$ecret.key` only as a local testing fallback when unset; code logs a warning if that fallback is used.
 - `PORT`: API port (default 3000).
 - `EXPIREMINUTES`: challenge expiry minutes (default 10).
 - `MAXRECORDS`: in-memory single-use token cache size (default 1000).
@@ -76,5 +76,5 @@
 
 - Do not ship with default `SECRET`.
 - In-memory token cache is not shared across replicas; use a shared store if you scale (out of scope here).
-- The demo proxy posts to `/test` and calls the API through `API_BASE_URL`.
+- Demo routes: serves `/`, exposes `GET /challenge` for the widget and proxies it to API `/challenge`, and accepts `POST /test` for the demo form, which calls API `/verify` through `API_BASE_URL`. The demo does not expose a public `/verify` route.
 - Do not reintroduce API-process `DEMO=true` behavior; the demo must remain a separate process/container.

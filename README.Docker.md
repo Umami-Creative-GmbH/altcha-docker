@@ -16,7 +16,7 @@ Compose builds two Dockerfile targets:
 - `server`: `api` target, runs `bun start` and exposes port 3000.
 - `demo`: `demo` target, runs `bun run start:demo` and exposes port 8080.
 
-The demo container uses `API_BASE_URL=http://server:3000` so it can proxy `/challenge` and `/verify` to the API service over the Compose network.
+The demo container uses `API_BASE_URL=http://server:3000` so it can serve `/`, proxy widget requests from `GET /challenge` to API `/challenge`, and handle demo form submissions at `POST /test` by calling API `/verify` over the Compose network. The demo does not expose a public `/verify` route.
 
 ## Build Images Individually
 
