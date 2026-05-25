@@ -1,6 +1,6 @@
 export type ReplayStore = {
-  get: (key: string) => boolean;
-  set: (key: string, value: boolean) => void;
+  get: (key: string) => boolean | Promise<boolean>;
+  set: (key: string, value: boolean) => void | Promise<void>;
 };
 
 export const createInMemoryReplayStore = (maxRecords: number): ReplayStore => {
@@ -17,7 +17,7 @@ export const createInMemoryReplayStore = (maxRecords: number): ReplayStore => {
 
       if (challengeOrder.length > maxRecords) {
         const oldest = challengeOrder.shift();
-        if (oldest) usedChallengeIds.delete(oldest);
+        if (oldest !== undefined) usedChallengeIds.delete(oldest);
       }
     },
   };

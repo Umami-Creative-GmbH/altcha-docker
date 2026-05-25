@@ -29,6 +29,16 @@ describe("createInMemoryReplayStore", () => {
     expect(store.get("c")).toBe(true);
   });
 
+  test("evicts empty-string IDs when max records is exceeded", () => {
+    const store = createInMemoryReplayStore(1);
+
+    store.set("", true);
+    store.set("next", true);
+
+    expect(store.get("")).toBe(false);
+    expect(store.get("next")).toBe(true);
+  });
+
   test("does not duplicate existing IDs in eviction order", () => {
     const store = createInMemoryReplayStore(2);
 
