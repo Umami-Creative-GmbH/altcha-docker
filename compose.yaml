@@ -4,7 +4,7 @@ services:
       context: .
       target: api
     environment:
-      SECRET: ${SECRET:-secret.key}
+      SECRET: ${SECRET:-$$ecret.key}
       NODE_ENV: production
       CORS_ORIGIN: ${CORS_ORIGIN:-*}
       MAXNUMBER: ${MAXNUMBER:-5000}

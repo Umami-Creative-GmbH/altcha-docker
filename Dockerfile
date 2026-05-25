@@ -4,10 +4,10 @@ FROM oven/bun:1.3 AS base
 WORKDIR /usr/src/app
 
 FROM base AS build
-COPY package.json bun.lock tsconfig.json ./
-RUN bun install --frozen-lockfile
-COPY src ./src
-COPY scripts ./scripts
+RUN --mount=type=bind,source=package.json,target=package.json \
+    --mount=type=bind,source=bun.lock,target=bun.lock \
+    bun install --frozen-lockfile
+COPY . .
 RUN bun run build
 
 FROM base AS prod-deps
