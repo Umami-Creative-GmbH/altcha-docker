@@ -4,6 +4,9 @@
 # https://docs.docker.com/go/build-context-dockerignore/
 
 node_modules
+.env
+.env.*
+!.env.example
 Dockerfile*
 docker-compose*
 .dockerignore
