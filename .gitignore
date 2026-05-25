@@ -2,3 +2,7 @@
 .yarn/unplugged
 build/
 node_modules/
+docs/
+.env
+.env.*
+!.env.example
