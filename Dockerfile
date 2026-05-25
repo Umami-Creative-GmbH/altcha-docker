@@ -25,6 +25,8 @@ CMD ["bun", "start"]
 FROM base AS demo
 COPY package.json ./
 COPY --from=prod-deps /usr/src/app/node_modules ./node_modules
+COPY --from=build /usr/src/app/build/config.js ./build/config.js
+COPY --from=build /usr/src/app/build/demo-app.js ./build/demo-app.js
 COPY --from=build /usr/src/app/build/demo.js ./build/demo.js
 COPY --from=build /usr/src/app/build/demo ./build/demo
 USER bun
