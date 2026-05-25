@@ -28,12 +28,12 @@
   - API: `http://localhost:3000`
   - Demo: `http://localhost:8080`
   - Override secret once:
-    - PowerShell: `$env:SECRET = "<long-random>"; docker compose up --build`
-    - Unix: `SECRET="<long-random>" docker compose up --build`
+    - PowerShell: `$env:ALTCHA_SECRET = "<long-random>"; docker compose up --build`
+    - Unix: `ALTCHA_SECRET="<long-random>" docker compose up --build`
 
 ## Configuration (env)
 
-- `SECRET` (required): HMAC key for ALTCHA. The API app requires it when run directly. Compose supplies `$ecret.key` only as a local testing fallback when unset; code logs a warning if that fallback is used.
+- `SECRET` (required): HMAC key for ALTCHA. The API app requires this container/runtime variable. Compose maps `ALTCHA_SECRET` to container `SECRET` and supplies `$ecret.key` only as a local testing fallback when `ALTCHA_SECRET` is unset; code logs a warning if that fallback is used.
 - `PORT`: API port (default 3000).
 - `EXPIREMINUTES`: challenge expiry minutes (default 10).
 - `MAXRECORDS`: in-memory single-use token cache size (default 1000).
@@ -74,7 +74,7 @@
 
 ## Gotchas
 
-- Do not ship with default `SECRET`.
+- Do not ship with the default `ALTCHA_SECRET`/container `SECRET`.
 - In-memory token cache is not shared across replicas; use a shared store if you scale (out of scope here).
 - Demo routes: serves `/`, exposes `GET /challenge` for the widget and proxies it to API `/challenge`, and accepts `POST /test` for the demo form, which calls API `/verify` through `API_BASE_URL`. The demo does not expose a public `/verify` route.
 - Do not reintroduce API-process `DEMO=true` behavior; the demo must remain a separate process/container.

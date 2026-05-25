@@ -33,20 +33,20 @@ docker compose up --build
 To override the secret temporarily in PowerShell:
 
 ```powershell
-$env:SECRET = "your-very-long-random-key"; docker compose up --build
+$env:ALTCHA_SECRET = "your-very-long-random-key"; docker compose up --build
 ```
 
 Unix/macOS:
 
 ```bash
-SECRET="your-very-long-random-key" docker compose up --build
+ALTCHA_SECRET="your-very-long-random-key" docker compose up --build
 ```
 
 ## Configuration
 
 The API service reads the following environment variables:
 
-- SECRET (required): HMAC key used to sign/verify challenges. The API app requires this value when run directly. Docker Compose supplies `$ecret.key` only as a local testing fallback when `SECRET` is unset; don’t use it in production. Use a Compose-safe value such as `change-me-to-a-long-random-string` in `.env`.
+- SECRET (required): HMAC key used to sign/verify challenges. The API app requires this container/runtime value. Docker Compose maps `ALTCHA_SECRET` to container `SECRET` and supplies `$ecret.key` only as a local testing fallback when `ALTCHA_SECRET` is unset; don’t use it in production.
 - PORT: API port, default 3000.
 - EXPIREMINUTES: Challenge expiry in minutes, default 10.
 - MAXRECORDS: Size of in‑memory single‑use token cache, default 1000.
@@ -68,6 +68,8 @@ You can provide variables via:
 Example .env:
 
 ```env
+ALTCHA_SECRET=change-me-to-a-long-random-string
+# Direct Bun/API runtime only:
 SECRET=change-me-to-a-long-random-string
 PORT=3000
 EXPIREMINUTES=10
@@ -189,7 +191,7 @@ bun run dev
 
 ## Production notes
 
-- Change SECRET to a strong, unique value. Never use the default.
+- Change `ALTCHA_SECRET` for Docker Compose, or `SECRET` for direct API/container runtime, to a strong unique value. Never use the default.
 - Do not bake `.env` files or secrets into images; provide runtime environment variables from Compose, your orchestrator, or a secret manager.
 - Consider terminating TLS in front of the container and restricting access to /verify if needed.
 - In-memory replay protection is single-instance only; for horizontal scaling, replace the in-memory token cache with a shared store.
