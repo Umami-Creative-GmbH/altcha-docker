@@ -2,10 +2,10 @@
 
 # ALTCHA Docker
 
-A lightweight Dockerized ALTCHA challenge/verify service built with Bun + Express. It exposes simple endpoints to generate ALTCHA challenges and verify solutions, and includes an optional demo UI.
+A lightweight Dockerized ALTCHA challenge/verify service built with Bun + Express. It exposes simple endpoints to generate ALTCHA challenges and verify solutions, and includes a separate demo UI container.
 
 - Runtime: Bun
-- Ports: 3000 (API), 8080 (optional demo)
+- Ports: 3000 (API), 8080 (demo)
 - Upstream libs: altcha, altcha-lib
 
 ## Quick start
@@ -27,34 +27,37 @@ docker compose up --build
 docker compose up --build
 ```
 
-- API base: http://localhost:3000
-- Demo (if enabled): http://localhost:8080
+- API: http://localhost:3000
+- Demo: http://localhost:8080
 
 To override the secret temporarily in PowerShell:
 
 ```powershell
-$env:SECRET = "your-very-long-random-key"; docker compose up --build
+$env:ALTCHA_SECRET = "your-very-long-random-key"; docker compose up --build
 ```
 
 Unix/macOS:
 
 ```bash
-SECRET="your-very-long-random-key" docker compose up --build
+ALTCHA_SECRET="your-very-long-random-key" docker compose up --build
 ```
 
 ## Configuration
 
-The service reads the following environment variables:
+The API service reads the following environment variables:
 
-- SECRET (required): HMAC key used to sign/verify challenges. Default is $ecret.key (don’t use this in production).
+- SECRET (required): HMAC key used to sign/verify challenges. The API app requires this container/runtime value. Docker Compose maps `ALTCHA_SECRET` to container `SECRET` and supplies `$ecret.key` only as a local testing fallback when `ALTCHA_SECRET` is unset; don’t use it in production.
 - PORT: API port, default 3000.
 - EXPIREMINUTES: Challenge expiry in minutes, default 10.
 - MAXRECORDS: Size of in‑memory single‑use token cache, default 1000.
 - CORS_ORIGIN: Allowed CORS origin(s), default *. Use comma-separated values for multiple origins.
 - ALGORITHM: ALTCHA v2 algorithm, default PBKDF2/SHA-256.
 - MAXNUMBER: ALTCHA v2 proof-of-work cost (difficulty), default 5000.
-- API_BASE_URL: Optional demo proxy target for /challenge and /verify. Defaults to http://127.0.0.1:$PORT.
-- DEMO: When "true", starts a simple demo UI on port 8080.
+
+The demo service reads the following environment variables:
+
+- API_BASE_URL: Base API URL used by the demo to proxy `GET /challenge` and verify demo form submissions from `POST /test`, default http://server:3000 in Docker Compose.
+- DEMO_PORT: Demo HTTP port, default 8080.
 
 You can provide variables via:
 
@@ -65,6 +68,8 @@ You can provide variables via:
 Example .env:
 
 ```env
+ALTCHA_SECRET=change-me-to-a-long-random-string
+# Direct Bun/API runtime only:
 SECRET=change-me-to-a-long-random-string
 PORT=3000
 EXPIREMINUTES=10
@@ -72,9 +77,14 @@ MAXRECORDS=1000
 CORS_ORIGIN=*
 ALGORITHM=PBKDF2/SHA-256
 MAXNUMBER=5000
-# API_BASE_URL=http://127.0.0.1:3000
-DEMO=false
+API_BASE_URL=http://server:3000
+DEMO_PORT=8080
 ```
+
+## Migration note (demo container)
+
+- `DEMO=true` no longer starts the demo UI inside the API container.
+- Use the separate `demo` service in Docker Compose, or build/run the Dockerfile `demo` target.
 
 ## Migration note (COST -> MAXNUMBER)
 
@@ -113,9 +123,9 @@ Notes:
 - CORS is open (origin: \*).
 - Record reuse protection is best-effort and stored in-memory; scale-out or restarts will reset the cache. For production, pair with a shared store or upstream protections as needed.
 
-## Demo UI (optional)
+## Demo UI
 
-Enable the built-in demo page by setting DEMO=true. It serves a minimal HTML form at http://localhost:8080 and proxies widget requests through the demo server at /challenge (and form verification to /verify via the same proxy target). This avoids hardcoded localhost API URLs and works better when running on remote hosts.
+Docker Compose starts a dedicated demo service at http://localhost:8080. The demo serves `/`, exposes `GET /challenge` for the widget and proxies it to API `/challenge`, and accepts the demo form at `POST /test`, which calls API `/verify` through the same `API_BASE_URL` target. The demo does not expose a public `/verify` route.
 
 ## Client integration example
 
@@ -181,9 +191,10 @@ bun run dev
 
 ## Production notes
 
-- Change SECRET to a strong, unique value. Never use the default.
+- Change `ALTCHA_SECRET` for Docker Compose, or `SECRET` for direct API/container runtime, to a strong unique value. Never use the default.
+- Do not bake `.env` files or secrets into images; provide runtime environment variables from Compose, your orchestrator, or a secret manager.
 - Consider terminating TLS in front of the container and restricting access to /verify if needed.
-- For horizontal scaling, replace the in-memory token cache with a shared store.
+- In-memory replay protection is single-instance only; for horizontal scaling, replace the in-memory token cache with a shared store.
 - Pin image versions and consider multi-arch builds if deploying across architectures.
 
 ## License

@@ -2,11 +2,23 @@ services:
   server:
     build:
       context: .
+      target: api
     environment:
-      SECRET: $ecret.key
+      SECRET: ${ALTCHA_SECRET:-$$ecret.key}
       NODE_ENV: production
-      CORS_ORIGIN: "*"
-      MAXNUMBER: 5000
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+      MAXNUMBER: ${MAXNUMBER:-5000}
     ports:
-      - 3000:3000
-      - 8080:8080
+      - "3000:3000"
+
+  demo:
+    build:
+      context: .
+      target: demo
+    environment:
+      NODE_ENV: production
+      API_BASE_URL: http://server:3000
+    depends_on:
+      - server
+    ports:
+      - "8080:8080"
