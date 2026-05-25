@@ -6,7 +6,7 @@
     "build": "bun run tsc",
     "dev": "bun --watch ./src/index.ts",
     "start": "bun ./build/index.js",
-    "test": "bun test",
+    "test": "bun test src/**/*.test.ts",
     "tsc": "tsc"
   },
   "keywords": [],
