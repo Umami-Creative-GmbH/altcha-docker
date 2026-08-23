@@ -1,9 +1,5 @@
-import dotenv from "dotenv";
-
 import { parseDemoConfig } from "./config";
 import { createDemoApp } from "./demo-app";
-
-dotenv.config();
 
 const start = () => {
   const config = parseDemoConfig();

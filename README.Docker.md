@@ -19,8 +19,10 @@ ALTCHA_SECRET=change-me-to-a-long-random-string docker compose up --build
 
 Compose builds two Dockerfile targets:
 
-- `server`: `api` target, runs `bun start` and exposes port 3000.
-- `demo`: `demo` target, runs `bun run start:demo` and exposes port 8080.
+- `server`: `api` target, runs the bundled API entrypoint and exposes port 3000.
+- `demo`: `demo` target, runs the bundled demo entrypoint and exposes port 8080.
+
+The build stage is pinned to Bun 1.4.0. The final stages use Bun's matching slim image and contain only their minified bundle and required demo asset—no runtime `node_modules`, lockfile, or package manifest.
 
 The demo container uses `API_BASE_URL=http://server:3000` so it can serve `/`, proxy widget requests from `GET /challenge` to API `/challenge`, and handle demo form submissions at `POST /test` by calling API `/verify` over the Compose network. The demo does not expose a public `/verify` route.
 
@@ -83,11 +85,11 @@ Demo settings:
 
 ## Deployment Notes
 
-Push the built images to your registry:
+The GitHub Actions workflow publishes the API under the repository image name and the demo under the same name with an `-demo` suffix. For manual publishing, use the same convention:
 
 ```bash
-docker tag altcha-docker-api myregistry.com/altcha-docker-api:latest
-docker push myregistry.com/altcha-docker-api:latest
+docker tag altcha-docker-api myregistry.com/altcha-docker:latest
+docker push myregistry.com/altcha-docker:latest
 docker tag altcha-docker-demo myregistry.com/altcha-docker-demo:latest
 docker push myregistry.com/altcha-docker-demo:latest
 ```

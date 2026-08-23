@@ -22,7 +22,6 @@ export const createDemoApp = (config: DemoConfig): Express => {
       },
     },
   }));
-  app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
   app.get("/", (_req: Request, res: Response) => {

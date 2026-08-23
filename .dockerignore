@@ -4,15 +4,19 @@
 # https://docs.docker.com/go/build-context-dockerignore/
 
 node_modules
+build
+docs
 .env
 .env.*
 !.env.example
 Dockerfile*
 docker-compose*
+compose.yaml
 .dockerignore
 .git
 .gitignore
 README.md
+README.Docker.md
 LICENSE
 .vscode
 .editorconfig

@@ -1,9 +1,5 @@
-import dotenv from "dotenv";
-
 import { createApiApp } from "./api-app";
 import { parseApiConfig } from "./config";
-
-dotenv.config();
 
 const start = async () => {
   const config = parseApiConfig();
