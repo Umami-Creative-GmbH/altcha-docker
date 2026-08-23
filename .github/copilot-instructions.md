@@ -3,21 +3,21 @@
 ## Overview
 
 - Purpose: Dockerized ALTCHA challenge/verify microservice using Bun + Express. Provides `/challenge` and `/verify` used by the ALTCHA widget, plus a separate demo UI service.
-- Key libs: `altcha`, `altcha-lib`, `express@5`, `helmet`, `cors`, `dotenv`.
-- API entrypoint: `src/index.ts` → transpiled to `build/index.js`.
-- Demo entrypoint: `src/demo.ts` → transpiled to `build/demo.js`.
+- Key libs: `altcha-lib`, `express@5`, `helmet`, `cors`.
+- API entrypoint: `src/index.ts` → bundled to `build/index.js`.
+- Demo entrypoint: `src/demo.ts` → bundled to `build/demo.js`.
 
 ## Repo layout
 
-- `src/index.ts`: API startup; loads dotenv, parses API config, starts the API app on `PORT` (default 3000).
+- `src/index.ts`: API startup; parses API config and starts the API app on `PORT` (default 3000). Bun loads local `.env` files automatically.
 - `src/api-app.ts`: Express API app with `/`, `/challenge`, and `/verify`.
-- `src/demo.ts`: Demo startup; loads dotenv, parses demo config, starts the demo app on `DEMO_PORT` (default 8080).
+- `src/demo.ts`: Demo startup; parses demo config and starts the demo app on `DEMO_PORT` (default 8080).
 - `src/demo-app.ts`: Express demo app, static demo assets, `GET /challenge` proxy to API `/challenge`, and `POST /test` form handler that calls API `/verify`.
 - `src/config.ts`: API/demo env parsing and validation.
 - `src/replay-store.ts`: In-memory single-use token replay protection.
 - `Dockerfile`: multi-stage Bun build with separate `api` and `demo` targets; does not copy `.env` into final images.
 - `compose.yaml`: runs `server` and `demo` separately; exposes 3000 for API and 8080 for demo.
-- `package.json` scripts: `build` (tsc via Bun plus demo assets), `dev` (API watch), `start` (run built API), `start:demo` (run built demo).
+- `package.json` scripts: `build` (type-check, minified Bun bundles, and demo assets), `dev` (API watch), `start` (run bundled API), `start:demo` (run bundled demo).
 
 ## Build & run
 
@@ -42,7 +42,7 @@
 - `MAXNUMBER`: ALTCHA v2 proof-of-work cost (default 5000); preferred over legacy `COST`.
 - `API_BASE_URL`: demo proxy target (default `http://server:3000`).
 - `DEMO_PORT`: demo port (default 8080).
-- `.env` is loaded by `dotenv` at runtime for local/Bun runs and by Docker Compose for variable substitution; final Docker images must not contain `.env`.
+- `.env` is loaded automatically by Bun for local runs and by Docker Compose for variable substitution; final Docker images must not contain `.env`.
 
 ## API contracts (keep stable)
 
@@ -54,7 +54,7 @@
 
 ## Patterns & conventions
 
-- TypeScript strict mode; output in `build/` (`tsconfig.json` → `outDir`=`build`).
+- TypeScript strict mode with `noEmit`; Bun writes minified production bundles to `build/`.
 - Express 5 style middleware; minimal error handling by design (status-only API).
 - Keep endpoints and status codes as-is to preserve client integrations and docs.
 - When adding env vars or endpoints, update `README.md` and `.env.example`.

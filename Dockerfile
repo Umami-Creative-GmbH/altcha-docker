@@ -1,34 +1,28 @@
 # syntax=docker/dockerfile:1
 
-FROM oven/bun:1.3 AS base
-WORKDIR /usr/src/app
+ARG BUN_VERSION=1.4.0
 
-FROM base AS build
+FROM oven/bun:${BUN_VERSION} AS build
+WORKDIR /usr/src/app
 RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=bind,source=bun.lock,target=bun.lock \
     bun install --frozen-lockfile
-COPY . .
+COPY package.json tsconfig.json ./
+COPY scripts ./scripts
+COPY src ./src
 RUN bun run build
 
-FROM base AS prod-deps
-COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile --production
-
-FROM base AS api
-COPY package.json ./
-COPY --from=prod-deps /usr/src/app/node_modules ./node_modules
-COPY --from=build /usr/src/app/build ./build
+FROM oven/bun:${BUN_VERSION}-slim AS api
+WORKDIR /usr/src/app
+COPY --from=build /usr/src/app/build/index.js ./build/index.js
 USER bun
 EXPOSE 3000
-CMD ["bun", "start"]
+CMD ["bun", "./build/index.js"]
 
-FROM base AS demo
-COPY package.json ./
-COPY --from=prod-deps /usr/src/app/node_modules ./node_modules
-COPY --from=build /usr/src/app/build/config.js ./build/config.js
-COPY --from=build /usr/src/app/build/demo-app.js ./build/demo-app.js
+FROM oven/bun:${BUN_VERSION}-slim AS demo
+WORKDIR /usr/src/app
 COPY --from=build /usr/src/app/build/demo.js ./build/demo.js
 COPY --from=build /usr/src/app/build/demo ./build/demo
 USER bun
 EXPOSE 8080
-CMD ["bun", "run", "start:demo"]
+CMD ["bun", "./build/demo.js"]

@@ -61,7 +61,7 @@ The demo service reads the following environment variables:
 
 You can provide variables via:
 
-- .env file in the project root (Docker Compose reads it automatically)
+- .env file in the project root (Bun and Docker Compose read it automatically)
 - compose.yaml environment section
 - Directly in your shell (e.g., $env:NAME in PowerShell)
 
@@ -163,7 +163,7 @@ Expect 202 on success or 417 on failure/reuse.
 
 ## Building and running without Docker
 
-You can run locally with Bun (requires Bun installed):
+You can run locally with Bun (requires Bun 1.4.0 or newer). The build type-checks the source and creates minified API and demo bundles:
 
 ```powershell
 bun install
